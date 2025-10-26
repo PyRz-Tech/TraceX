@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeX</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Poppins Font (Bold and Modern) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0D1117 0%, #1A1F2E 100%);
+            color: #E6E9F0;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1300px;
+            padding: 20px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #1C222B;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(41, 98, 255, 0.25);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: slideIn 0.6s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(41, 98, 255, 0.35);
+        }
+        .form-control, .form-select {
+            background-color: #2A2E39;
+            border: 1px solid #3C4454;
+            color: #E6E9F0;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #2962FF;
+            box-shadow: 0 0 15px rgba(41, 98, 255, 0.7), 0 0 25px rgba(41, 98, 255, 0.5);
+            background-color: #2A2E39;
+            color: #E6E9F0;
+        }
+        .btn-tradingview {
+            background: linear-gradient(90deg, #2962FF, #3F8CFF);
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .btn-tradingview:hover {
+            background: linear-gradient(90deg, #3F8CFF, #2962FF);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(41, 98, 255, 0.6);
+        }
+        .table-dark {
+            background-color: #1C222B;
+            color: #E6E9F0;
+            font-size: 13px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-dark th, .table-dark td {
+            border-color: #3C4454;
+            padding: 12px;
+            font-weight: 500;
+        }
+        .chart-container {
+            height: 450px;
+            padding: 20px;
+            border-radius: 16px;
+            background-color: #1C222B;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        }
+        h1, h2 {
+            font-weight: 700;
+            color: #E6E9F0;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 6px rgba(41, 98, 255, 0.4);
+        }
+        h1 i {
+            color: #2962FF;
+            font-size: 32px;
+            margin-right: 12px;
+            transition: transform 0.3s ease;
+        }
+        h1 i:hover {
+            transform: rotate(20deg);
+        }
+        .error-message {
+            background: linear-gradient(90deg, #D32F2F, #FF5555);
+            color: #FFF;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            animation: shake 0.4s ease-in-out;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+        }
+        .loader {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #3C4454;
+            border-top: 4px solid #2962FF;
+            border-right: 4px solid #3F8CFF;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 20px auto;
+        }
+        .symbol-header {
+            background: #2A2E39;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #E6E9F0;
+            box-shadow: 0 2px 8px rgba(41, 98, 255, 0.2);
+        }
+        .input-group-text {
+            background-color: #2A2E39;
+            border: 1px solid #3C4454;
+            border-radius: 12px 0 0 12px;
+            padding: 12px;
+            color: #2962FF;
+        }
+        .fa-rocket {
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+        .fa-rocket:hover {
+            transform: scale(1.3);
+        }
+        .stats-card {
+            background: linear-gradient(145deg, #1C222B, #2A2E39);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 13px;
+            color: #E6E9F0;
+            box-shadow: 0 2px 8px rgba(41, 98, 255, 0.2);
+            animation: slideIn 0.6s ease-in-out;
+        }
+        .stats-card .stat-label {
+            font-weight: 500;
+            color: #A1A7BB;
+        }
+        .stats-card .stat-value {
+            color: #2962FF;
+            font-weight: 700;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(6px); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <h1 class="text-center mb-5"><i class="fas fa-rocket"></i> TradeX</h1>
+
+        <!-- Form for Stock Symbol and Interval -->
+        <div class="card mb-5 p-4">
+            <form method="get" class="d-flex justify-content-center align-items-center">
+                <div class="input-group w-75">
+                    <span class="input-group-text"><i class="fas fa-rocket"></i></span>
+                    {{ form.symbol }}
+                    {{ form.interval }}
+                    <button type="submit" class="btn btn-tradingview ms-2" onclick="showLoader()">Track</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loader -->
+        <div id="loader" class="loader"></div>
+
+        <!-- Error Message -->
+        {% if error %}
+            <div class="error-message mb-5">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+            </div>
+        {% else %}
+            <!-- Stock Info -->
+            <div class="symbol-header mb-5">
+                Ticker {{ symbol }}
+            </div>
+
+            <!-- Stats Card -->
+            <div class="stats-card mb-5">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="stat-label">Surge</div>
+                        <div class="stat-value">{{ surge }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-label">Peak</div>
+                        <div class="stat-value">{{ peak }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-label">Dip</div>
+                        <div class="stat-value">{{ dip }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="card mb-5 chart-container">
+                <canvas id="stockChart"></canvas>
+            </div>
+
+            <!-- Data Table -->
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="mb-4">Stats</h2>
+                    {{ table | safe }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            new Chart(ctx, {{ chart | safe }});
+        });
+
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
